@@ -13,16 +13,10 @@ OpenCV: For image processing.
 Python 3.x
 Installation
 Clone the repository:
-bash
-Copy code
-git clone https://github.com/yourusername/repository-name.git
+git clone https://github.com/rohanvij05/Real-Time-Emotion-Based-Music-Recommendation-App.git
 Install required packages:
-bash
-Copy code
 pip install -r requirements.txt
 Run the app:
-bash
-Copy code
 python app.py
 Usage
 Open the app in your browser.
