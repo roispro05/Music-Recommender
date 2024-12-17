@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emotion-Based Music Recommender</title>
+    <style>
+        /* Global styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(45deg, #A294F9, #CDC1FF); /* Gradient background with new colors */
+            color: #000; /* Set all text to black */
+            text-align: center;
+            height: auto;  /* Allow the page to be scrollable */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-y: auto; /* Enable vertical scrolling */
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 2s ease-out;
+            font-weight: 700; /* Bold text for heading */
+            letter-spacing: 1.5px; /* Slight letter spacing */
+            line-height: 1.2; /* Adjust line height for better readability */
+        }
+
+        p {
+            font-size: 1.3rem;
+            margin: 10px 0;
+            opacity: 0.9;
+            animation: fadeIn 2s ease-out;
+            font-weight: 500; /* Medium weight text for paragraphs */
+            letter-spacing: 0.5px;
+            line-height: 1.6; /* Adjust line height for readability */
+        }
+
+        /* Video and webcam styling */
+        video {
+            border: 5px solid #CDC1FF; /* Border color matching the theme */
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            margin-top: 20px;
+            animation: slideIn 2s ease-out;
+        }
+
+        #emotion {
+            font-size: 1.5rem;
+            margin-top: 20px;
+            font-weight: bold;
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+            opacity: 0.8;
+            animation: fadeIn 2s ease-out;
+            letter-spacing: 1px;
+            line-height: 1.5;
+        }
+
+        #song-recommendation {
+            margin-top: 30px;
+            font-size: 1.4rem;
+            animation: fadeIn 2s ease-out;
+            letter-spacing: 0.8px;
+            line-height: 1.5;
+        }
+
+        /* Song selection buttons */
+        #song-options {
+            margin-top: 40px;
+            display: none;
+        }
+
+        #song-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-top: -20px; /* Slightly move the buttons up */
+        }
+
+        .song-button {
+            background: linear-gradient(45deg, #A294F9, #CDC1FF); /* Gradient button background */
+            color: #000; /* Black text on buttons */
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s, background 0.3s;
+            max-width: 200px;
+            margin: 10px;
+            text-align: center;
+            font-weight: 600; /* Bold text for buttons */
+            letter-spacing: 1px;
+        }
+
+        .song-button:hover {
+            background: linear-gradient(45deg, #E5D9F2, #F5EFFF); /* Lighter hover effect */
+            transform: scale(1.05);
+        }
+
+        .song-button:active {
+            background: linear-gradient(45deg, #F5EFFF, #A294F9); /* Active state with a different color */
+        }
+
+        /* Audio player styling */
+        audio {
+            margin-top: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Keyframe animations */
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideIn {
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(0);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            video {
+                width: 90%;
+                height: auto;
+            }
+
+            .song-button {
+                font-size: 1rem;
+                padding: 10px 20px;
+                color: #000;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            p {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Emotion-Based Music Recommender</h1>
+    <p>Start your webcam, and we will recommend music based on your emotion!</p>
+
+    <video id="video" width="640" height="480" autoplay></video>
+    <div id="emotion">Emotion: Detecting...</div>
+    <div id="song-recommendation">
+        <p>Song Recommendation: <span id="song-link"></span></p>
+    </div>
+
+    <div id="song-options" style="display:none;">
+        <p>Please select a song:</p>
+        <div id="song-buttons"></div>
+    </div>
+
+    <audio id="song-player" controls autoplay>
+        <source id="song-source" type="audio/mp3">
+        Your browser does not support the audio element.
+    </audio>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="static/js/webcam.js"></script>
+</body>
+</html>
