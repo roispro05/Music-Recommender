@@ -25,3 +25,7 @@ Based on your facial expression, a playlist of 5 songs will be recommended.
 Contributing
 Feel free to fork and submit pull requests to improve the app!
 
+
+
+https://github.com/user-attachments/assets/dee37cf3-ce50-4783-8986-2648aeab5e15
+
