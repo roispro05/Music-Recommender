@@ -1,6 +1,9 @@
-Flask
-flask-cors
-opencv-python
-deepface
-numpy
 gunicorn
+tensorflow==2.12.0
+keras==2.12.0
+tf-keras
+deepface
+flask
+flask_cors
+numpy
+opencv-python
