@@ -1,7 +1,6 @@
-Flask==2.2.3
-deepface==0.0.78
-opencv-python==4.7.0.72
-numpy==1.23.4
-requests==2.28.2
-Pillow==9.3.0
-werkzeug==2.2.3
+Flask
+flask-cors
+opencv-python
+deepface
+numpy
+gunicorn
