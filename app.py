@@ -63,4 +63,6 @@ def detect_emotion():
         return jsonify({"error": str(e)})
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    from waitress import serve  # Production server
+    serve(app, host="0.0.0.0", port=8080)
+
