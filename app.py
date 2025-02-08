@@ -1,4 +1,5 @@
 from flask import Flask, render_template, jsonify, request
+from flask_cors import CORS  # ✅ Import CORS to allow frontend-backend communication
 import cv2
 import random
 from deepface import DeepFace
@@ -8,6 +9,7 @@ import os
 
 # Initialize Flask app
 app = Flask(__name__)
+CORS(app)  # ✅ Allows frontend to make requests to backend
 
 # Emotion to song file mappings (each emotion has 5 songs)
 emotion_tos = {
@@ -32,20 +34,10 @@ emotion_tos = {
         "mera wala dance.mp3", "party in usa.mp3"
     ]
 }
-from flask import Flask, render_template
-
-app = Flask(__name__)
-
-# Route for the chatbot page
-@app.route('/chatbot')
-def chatbot():
-    return render_template('chatbot.html')
 
 # Helper function to recommend 5 songs based on emotion
 def recommends(emotion):
-    if emotion not in emotion_tos:
-        raise ValueError(f"No songs available for the emotion: {emotion}")
-    return emotion_tos[emotion]
+    return emotion_tos.get(emotion, [])
 
 @app.route('/')
 def index():
@@ -53,22 +45,38 @@ def index():
 
 @app.route('/detect_emotion', methods=['POST'])
 def detect_emotion():
-    # Get the base64 image from frontend (webcam)
-    image_data = request.json['image']
-    img_data = base64.b64decode(image_data.split(',')[1])
-    
-    # Convert to numpy array and decode image
-    np_img = np.frombuffer(img_data, dtype=np.uint8)
-    frame = cv2.imdecode(np_img, cv2.IMREAD_COLOR)
-
     try:
+        # Get the base64 image from frontend (webcam)
+        image_data = request.json.get('image', '')
+        if not image_data:
+            return jsonify({"error": "No image data received"}), 400
+
+        img_data = base64.b64decode(image_data.split(',')[1])
+        
+        # Convert to numpy array and decode image
+        np_img = np.frombuffer(img_data, dtype=np.uint8)
+        frame = cv2.imdecode(np_img, cv2.IMREAD_COLOR)
+
+        if frame is None:
+            return jsonify({"error": "Failed to decode image"}), 400
+
+        # Save frame temporarily since DeepFace needs a file path
+        temp_path = "temp.jpg"
+        cv2.imwrite(temp_path, frame)
+
         # DeepFace emotion detection
-        analysis = DeepFace.analyze(img_path=frame, actions=['emotion'])
+        analysis = DeepFace.analyze(img_path=temp_path, actions=['emotion'])
         dominant_emotion = analysis[0]['dominant_emotion']
         songs = recommends(dominant_emotion)
+
+        # Remove temp file
+        os.remove(temp_path)
+
         return jsonify({"emotion": dominant_emotion, "songs": songs})
+    
     except Exception as e:
-        return jsonify({"error": str(e)})
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))  # ✅ Default to 5000 if no PORT env var
+    app.run(host="0.0.0.0", port=port, debug=True)
