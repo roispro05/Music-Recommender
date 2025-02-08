@@ -1,7 +1,6 @@
-// Accessing the webcam and displaying it in a video element
+// Accessing elements
 const video = document.getElementById('video');
 const emotionElement = document.getElementById('emotion');
-const songElement = document.getElementById('song-link');
 const songOptionsDiv = document.getElementById('song-options');
 const songButtonsDiv = document.getElementById('song-buttons');
 const songPlayer = document.getElementById('song-player');
@@ -16,24 +15,22 @@ navigator.mediaDevices.getUserMedia({ video: true })
     alert('Could not access the webcam: ' + err);
   });
 
-// Capture image from the webcam every 1 second
+// Emotion detection logic
 let isEmotionDetected = false;
 let captureInterval = setInterval(() => {
-  if (isEmotionDetected) return;  // Stop capturing if emotion is already detected
+  if (isEmotionDetected) return;  // Stop capturing if emotion detected
 
   const canvas = document.createElement('canvas');
   canvas.width = video.videoWidth;
   canvas.height = video.videoHeight;
   const context = canvas.getContext('2d');
   context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-  // Convert canvas to base64 image
-  const imageData = canvas.toDataURL('image/jpeg');
-
-  // Show loading text while detecting emotion
+  
+  const imageData = canvas.toDataURL('image/jpeg'); // Convert to base64
+  
   emotionElement.innerHTML = 'Detecting emotion...';
 
-  // Send the base64 image to the backend for emotion detection
+  // Send image to backend
   $.ajax({
     url: '/detect_emotion',
     method: 'POST',
@@ -42,47 +39,51 @@ let captureInterval = setInterval(() => {
     success: (response) => {
       if (response.error) {
         emotionElement.innerHTML = 'Error detecting emotion: ' + response.error;
-      } else {
-        emotionElement.innerHTML = 'Emotion: ' + response.emotion;
-        
-        // Show song options to the user
-        songOptionsDiv.style.display = 'block';
-        songButtonsDiv.innerHTML = '';  // Clear previous buttons
-        
-        // Create buttons for each song
-        response.songs.forEach(song => {
-          const button = document.createElement('button');
-          button.classList.add('song-button');
-          button.textContent = song;  // Show song filename (or customize this with a title)
-          
-          // On click, play the selected song
-          button.onclick = () => {
-            // Pause any currently playing song
-            songPlayer.pause();
-            songPlayer.currentTime = 0;
-            
-            songSource.src = `/static/music/${song}`;  // Set the song source
-            songPlayer.style.display = 'block';  // Show the audio player
-            songPlayer.load();  // Load the audio
-            songPlayer.play();  // Play the song
-
-            isEmotionDetected = true;  // Stop further detection after selection
-            
-            // Stop the webcam stream
-            const stream = video.srcObject;
-            const tracks = stream.getTracks();
-            tracks.forEach(track => track.stop());  // Stop the webcam
-
-            // Clear the interval for capturing images
-            clearInterval(captureInterval);
-          };
-
-          songButtonsDiv.appendChild(button);
-        });
+        return;
       }
+
+      emotionElement.innerHTML = 'Emotion: ' + response.emotion;
+      songOptionsDiv.style.display = 'block';
+      songButtonsDiv.innerHTML = ''; // Clear previous buttons
+
+      response.songs.forEach(song => {
+        const button = document.createElement('button');
+        button.classList.add('song-button');
+        button.textContent = song.replace('.mp3', '');  // Remove .mp3 extension
+
+        button.onclick = () => {
+          playSong(song);
+        };
+
+        songButtonsDiv.appendChild(button);
+      });
+
+      isEmotionDetected = true; // Stop further detection
+      clearInterval(captureInterval);
     },
-    error: (err) => {
+    error: () => {
       emotionElement.innerHTML = 'Error communicating with backend.';
     }
   });
-}, 1000);  // Capture every second
+}, 2000);  // Capture every 2 seconds
+
+// Function to play selected song
+function playSong(song) {
+  songPlayer.pause();
+  songPlayer.currentTime = 0;
+
+  songSource.src = `/static/music/${song}`;
+  songPlayer.style.display = 'block';
+  songPlayer.load();
+  songPlayer.play();
+
+  stopWebcam();
+}
+
+// Stop the webcam stream
+function stopWebcam() {
+  const stream = video.srcObject;
+  if (stream) {
+    stream.getTracks().forEach(track => track.stop());
+  }
+}
