@@ -35,9 +35,7 @@ emotion_tos = {
 
 # Helper function to recommend 5 songs based on emotion
 def recommends(emotion):
-    if emotion not in emotion_tos:
-        raise ValueError(f"No songs available for the emotion: {emotion}")
-    return emotion_tos[emotion]
+    return emotion_tos.get(emotion, [])
 
 @app.route('/')
 def index():
@@ -45,24 +43,32 @@ def index():
 
 @app.route('/detect_emotion', methods=['POST'])
 def detect_emotion():
-    # Get the base64 image from frontend (webcam)
-    image_data = request.json['image']
-    img_data = base64.b64decode(image_data.split(',')[1])
-    
-    # Convert to numpy array and decode image
-    np_img = np.frombuffer(img_data, dtype=np.uint8)
-    frame = cv2.imdecode(np_img, cv2.IMREAD_COLOR)
-
     try:
+        # Get the base64 image from frontend (webcam)
+        image_data = request.json['image']
+        img_data = base64.b64decode(image_data.split(',')[1])
+        
+        # Convert to numpy array and decode image
+        np_img = np.frombuffer(img_data, dtype=np.uint8)
+        frame = cv2.imdecode(np_img, cv2.IMREAD_COLOR)
+
+        # Save frame temporarily since DeepFace needs a file path
+        temp_path = "temp.jpg"
+        cv2.imwrite(temp_path, frame)
+
         # DeepFace emotion detection
-        analysis = DeepFace.analyze(img_path=frame, actions=['emotion'])
+        analysis = DeepFace.analyze(img_path=temp_path, actions=['emotion'])
         dominant_emotion = analysis[0]['dominant_emotion']
         songs = recommends(dominant_emotion)
+
+        # Remove temp file
+        os.remove(temp_path)
+
         return jsonify({"emotion": dominant_emotion, "songs": songs})
+    
     except Exception as e:
         return jsonify({"error": str(e)})
 
 if __name__ == "__main__":
-    from waitress import serve  # Production server
-    serve(app, host="0.0.0.0", port=8080)
-
+    port = int(os.environ.get("PORT", 10000))  # Render's PORT
+    app.run(host="0.0.0.0", port=port, debug=True)
