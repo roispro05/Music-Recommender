@@ -78,5 +78,5 @@ def detect_emotion():
         return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))  # ✅ Default to 5000 if no PORT env var
+    port = int(os.environ.get("PORT", 10000))  # Render assigns a PORT, default to 10000
     app.run(host="0.0.0.0", port=port, debug=True)
