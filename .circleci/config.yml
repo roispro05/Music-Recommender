@@ -24,7 +24,7 @@ jobs:
   say-bye:
     steps:
       -run:
-        name:"Say Bye!"
+        name: "Say Bye!"
         command: "echo Bye!"
 # Orchestrate jobs using workflows
 # See: https://circleci.com/docs/workflows/ & https://circleci.com/docs/configuration-reference/#workflows
