@@ -23,7 +23,7 @@ jobs:
           command: "echo RoIsPro!"
   say-bye:
 
-    edocker:
+    docker:
       # Specify the version you desire here
       # See: https://circleci.com/developer/images/image/cimg/base
       - image: cimg/base:current
