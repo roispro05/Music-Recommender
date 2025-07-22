@@ -23,6 +23,7 @@ jobs:
           command: "echo RoIsPro!"
   say-bye:
     steps:
+      -checkout
       -run:
         name: "Say Bye!"
         command: "echo Bye!"
