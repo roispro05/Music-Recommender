@@ -2,6 +2,8 @@ Real-Time Emotion-Based Music Recommendation App
 Description
 This app detects user emotions using facial recognition and recommends a personalized music playlist based on the detected emotion. Built with Flask, DeepFace, and OpenCV, it provides a real-time emotion-to-music experience.
 
+Simple commit
+
 Features
 Real-time emotion detection via webcam.
 Emotion-based song recommendations.
